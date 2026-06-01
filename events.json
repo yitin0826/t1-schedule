@@ -1,0 +1,122 @@
+{
+  "2026-6-1": [
+    {
+      "type": "match",
+      "tag": "比賽",
+      "title": "T1 vs Gen.G",
+      "meta": "下午 5:00 · LoL Park · LCK"
+    }
+  ],
+  "2026-6-3": [
+    {
+      "type": "video",
+      "tag": "新影片",
+      "title": "T-Hide EP.47",
+      "meta": "T1 官方 YouTube"
+    }
+  ],
+  "2026-6-4": [
+    {
+      "type": "match",
+      "tag": "比賽",
+      "title": "T1 vs KT Rolster",
+      "meta": "下午 5:00 · LoL Park · LCK"
+    }
+  ],
+  "2026-6-7": [
+    {
+      "type": "live",
+      "tag": "直播",
+      "title": "Faker SOOP 直播",
+      "meta": "下午 8:00 · SOOP TV"
+    },
+    {
+      "type": "activity",
+      "tag": "活動",
+      "title": "LCK 媒體日採訪",
+      "meta": "下午 2:00 · 首爾"
+    }
+  ],
+  "2026-6-8": [
+    {
+      "type": "match",
+      "tag": "比賽",
+      "title": "T1 vs DRX",
+      "meta": "下午 5:00 · LoL Park · LCK"
+    }
+  ],
+  "2026-6-10": [
+    {
+      "type": "video",
+      "tag": "新影片",
+      "title": "T-Side EP.22",
+      "meta": "T1 官方 YouTube"
+    },
+    {
+      "type": "live",
+      "tag": "直播",
+      "title": "Doran SOOP 直播",
+      "meta": "晚上 9:00 · SOOP TV"
+    }
+  ],
+  "2026-6-11": [
+    {
+      "type": "match",
+      "tag": "比賽",
+      "title": "T1 vs Cloud9",
+      "meta": "下午 3:00 · MSI 小組賽"
+    }
+  ],
+  "2026-6-13": [
+    {
+      "type": "match",
+      "tag": "比賽",
+      "title": "T1 vs Bilibili Gaming",
+      "meta": "下午 5:00 · MSI 小組賽"
+    },
+    {
+      "type": "activity",
+      "tag": "活動",
+      "title": "T1 粉絲見面會",
+      "meta": "下午 3:00 · 首爾"
+    }
+  ],
+  "2026-6-17": [
+    {
+      "type": "video",
+      "tag": "新影片",
+      "title": "T-Hide EP.48",
+      "meta": "T1 官方 YouTube"
+    }
+  ],
+  "2026-6-20": [
+    {
+      "type": "live",
+      "tag": "直播",
+      "title": "Oner SOOP 直播",
+      "meta": "晚上 9:00 · SOOP TV"
+    }
+  ],
+  "2026-6-24": [
+    {
+      "type": "video",
+      "tag": "新影片",
+      "title": "T-Side EP.23",
+      "meta": "T1 官方 YouTube"
+    }
+  ],
+  "2026-6-25": [
+    {
+      "type": "match",
+      "tag": "比賽",
+      "title": "T1 vs HLE",
+      "meta": "下午 5:00 · LoL Park · LCK"
+    },
+    {
+      "type": "live",
+      "tag": "直播",
+      "title": "Peyz SOOP 直播",
+      "meta": "晚上 10:00 · SOOP TV"
+    }
+  ]
+}

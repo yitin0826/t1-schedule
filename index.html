@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="T1 Schedule">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<title>T1 Schedule</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,"Helvetica Neue","PingFang TC",sans-serif;background:var(--bg,#f2f2f7);color:var(--txt,#1c1c1e);max-width:430px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+.app{flex:1;display:flex;flex-direction:column;background:#fff;}
+
+/* Topbar */
+.topbar{background:#fff;padding:52px 20px 14px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid #e5e5ea;position:sticky;top:0;z-index:10;}
+.topbar-logo{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;}
+.topbar-logo img{width:100%;height:100%;object-fit:cover;}
+.topbar-logo-emoji{font-size:30px;line-height:1;}
+.topbar-title{font-size:20px;font-weight:600;color:#1c1c1e;}
+
+/* Content */
+.content{flex:1;overflow-y:auto;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── 選手頁 ── */
+.player-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
+.player-card{background:#fff;border:0.5px solid #e5e5ea;border-radius:16px;overflow:hidden;}
+.player-img{width:100%;aspect-ratio:1;background:#f2f2f7;display:flex;align-items:center;justify-content:center;position:relative;}
+.player-img img{width:100%;height:100%;object-fit:cover;}
+.player-role-badge{position:absolute;top:8px;left:8px;background:#E2012D;color:#fff;font-size:10px;font-weight:500;padding:2px 7px;border-radius:6px;}
+.player-info{padding:10px 12px 12px;}
+.player-id{font-size:16px;font-weight:500;color:#1c1c1e;margin-bottom:2px;}
+.player-name{font-size:12px;color:#8e8e93;margin-bottom:8px;}
+.soop-btn{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;padding:7px;border:0.5px solid #E2012D;border-radius:10px;color:#E2012D;font-size:12px;text-decoration:none;font-weight:500;}
+.soop-btn:active{background:#FEF0F0;}
+
+/* ── 首頁月曆 ── */
+.legend{display:flex;align-items:center;gap:10px;padding:12px 16px 0;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#8e8e93;}
+.legend-dot{width:7px;height:7px;border-radius:50%;}
+.legend-dot.match{background:#E2012D;}
+.legend-dot.live{background:#22c55e;}
+.legend-dot.video{background:#a855f7;}
+.legend-dot.activity{background:#f59e0b;}
+.cal-wrap{padding:12px 16px 0;}
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.cal-nav-btn{background:none;border:0.5px solid #e5e5ea;border-radius:10px;padding:5px 14px;font-size:18px;cursor:pointer;color:#8e8e93;}
+.cal-month{font-size:17px;font-weight:600;color:#1c1c1e;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-hd{font-size:11px;color:#8e8e93;text-align:center;padding:4px 0;font-weight:500;}
+.cal-cell{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border-radius:8px;cursor:pointer;}
+.cal-cell:active{background:#f2f2f7;}
+.cal-num{font-size:13px;color:#1c1c1e;line-height:1.5;}
+.cal-num.today-num{background:#E2012D;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:600;}
+.cal-num.selected-num{outline:2px solid #E2012D;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;}
+.cal-num.today-num.selected-num{outline:none;}
+.cal-num.other-num{color:#c7c7cc;}
+.cal-dots{display:flex;gap:2px;justify-content:center;min-height:7px;}
+.dot{width:5px;height:5px;border-radius:50%;}
+.dot.match{background:#E2012D;}
+.dot.live{background:#22c55e;}
+.dot.video{background:#a855f7;}
+.dot.activity{background:#f59e0b;}
+.schedule-section{padding:16px;}
+.schedule-date-title{font-size:15px;font-weight:600;color:#1c1c1e;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.schedule-date-dot{width:8px;height:8px;background:#E2012D;border-radius:50%;flex-shrink:0;}
+.event-card{border:0.5px solid #e5e5ea;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;}
+.event-type-bar{width:3px;border-radius:2px;flex-shrink:0;align-self:stretch;}
+.event-type-bar.match{background:#E2012D;}
+.event-type-bar.live{background:#22c55e;}
+.event-type-bar.video{background:#a855f7;}
+.event-type-bar.activity{background:#f59e0b;}
+.event-tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:6px;display:inline-block;margin-bottom:4px;}
+.event-tag.match{background:#FEF0F0;color:#A32D2D;}
+.event-tag.live{background:#E8F8EF;color:#1a7a3e;}
+.event-tag.video{background:#F5EEFF;color:#7C3ABD;}
+.event-tag.activity{background:#FFF4E0;color:#8A5500;}
+.event-title{font-size:14px;font-weight:500;color:#1c1c1e;margin-bottom:3px;}
+.event-meta{font-size:12px;color:#8e8e93;}
+.no-event{text-align:center;padding:32px 20px;color:#8e8e93;font-size:14px;}
+
+/* ── 賽程頁 ── */
+.schedule-hero{background:#E2012D;padding:16px;}
+.hero-label{color:rgba(255,255,255,0.8);font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.today-card{background:#fff;border-radius:14px;padding:14px 16px;}
+.today-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.today-title{font-size:13px;font-weight:500;color:#E2012D;}
+.status-badge{font-size:11px;padding:3px 10px;border-radius:10px;color:#fff;font-weight:500;}
+.status-badge.live{background:#22c55e;}
+.status-badge.upcoming{background:#f59e0b;}
+.status-badge.completed{background:#8e8e93;}
+.match-row{display:flex;align-items:center;justify-content:space-between;}
+.team{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
+.team-logo-img{width:44px;height:44px;border-radius:50%;object-fit:contain;background:#f2f2f7;padding:4px;}
+.team-logo-fallback{width:44px;height:44px;border-radius:50%;background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.team-name{font-size:11px;color:#8e8e93;text-align:center;}
+.vs-block{text-align:center;flex:0 0 70px;}
+.score{font-size:28px;font-weight:600;color:#1c1c1e;letter-spacing:2px;}
+.match-time-txt{font-size:12px;color:#8e8e93;margin-top:2px;}
+.match-meta{margin-top:10px;padding-top:10px;border-top:0.5px solid #e5e5ea;display:flex;justify-content:space-between;font-size:12px;color:#8e8e93;}
+.no-today{background:#fff;border-radius:14px;padding:20px;text-align:center;color:#8e8e93;font-size:13px;}
+.sched-section{padding:16px;}
+.sched-section-title{font-size:13px;font-weight:500;color:#8e8e93;margin-bottom:10px;letter-spacing:0.03em;text-transform:uppercase;}
+.sched-card{background:#fff;border:0.5px solid #e5e5ea;border-radius:14px;padding:12px 14px;margin-bottom:8px;}
+.sched-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.sched-date{font-size:12px;color:#8e8e93;}
+.sched-badge-upcoming{font-size:10px;padding:2px 8px;border-radius:6px;background:#FFF4E0;color:#8A5500;}
+.sched-teams{display:flex;align-items:center;gap:8px;}
+.sched-logo-img{width:28px;height:28px;border-radius:50%;object-fit:contain;background:#f2f2f7;padding:2px;}
+.sched-logo-fallback{width:28px;height:28px;border-radius:50%;background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.sched-logo-t1{width:28px;height:28px;border-radius:50%;background:#E2012D;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.sched-vs{font-size:11px;color:#c7c7cc;}
+.sched-name{font-size:14px;font-weight:500;color:#1c1c1e;}
+.sched-time{font-size:12px;color:#8e8e93;margin-top:2px;}
+.loading{text-align:center;padding:40px 20px;color:#8e8e93;font-size:14px;}
+.error-msg{text-align:center;padding:40px 20px;color:#E2012D;font-size:14px;}
+
+/* ── Tab Bar ── */
+.tabbar{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid #e5e5ea;background:#fff;position:sticky;bottom:0;}
+.tab{padding:10px 0 20px;text-align:center;cursor:pointer;color:#c7c7cc;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color 0.15s;}
+.tab i{font-size:24px;}
+.tab.active{color:#E2012D;}
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="topbar">
+  <div class="topbar-logo"><img src="tomato_logo.png" alt="Logo"></div>
+  <div class="topbar-title" id="topbarTitle">選手資料</div>
+ </div>
+
+ <div class="content">
+
+  <!-- 選手頁 -->
+  <div class="page active" id="page-players">
+   <div class="player-grid">
+    <div class="player-card">
+     <div class="player-img"><i class="ti ti-user" style="font-size:56px;color:#c7c7cc;"></i><span class="player-role-badge">上路</span></div>
+     <div class="player-info"><div class="player-id">Doran</div><div class="player-name">崔玄準</div><a class="soop-btn" href="https://play.sooptv.com/channels/10282584" target="_blank"><i class="ti ti-broadcast" style="font-size:13px;"></i>SOOP</a></div>
+    </div>
+    <div class="player-card">
+     <div class="player-img"><i class="ti ti-user" style="font-size:56px;color:#c7c7cc;"></i><span class="player-role-badge">打野</span></div>
+     <div class="player-info"><div class="player-id">Oner</div><div class="player-name">文炫竣</div><a class="soop-btn" href="https://play.sooptv.com/channels/10277609" target="_blank"><i class="ti ti-broadcast" style="font-size:13px;"></i>SOOP</a></div>
+    </div>
+    <div class="player-card">
+     <div class="player-img"><i class="ti ti-user" style="font-size:56px;color:#c7c7cc;"></i><span class="player-role-badge">中路</span></div>
+     <div class="player-info"><div class="player-id">Faker</div><div class="player-name">李相赫</div><a class="soop-btn" href="https://play.sooptv.com/channels/10296485" target="_blank"><i class="ti ti-broadcast" style="font-size:13px;"></i>SOOP</a></div>
+    </div>
+    <div class="player-card">
+     <div class="player-img"><i class="ti ti-user" style="font-size:56px;color:#c7c7cc;"></i><span class="player-role-badge">下路</span></div>
+     <div class="player-info"><div class="player-id">Peyz</div><div class="player-name">金修奐</div><a class="soop-btn" href="https://play.sooptv.com/channels/10277611" target="_blank"><i class="ti ti-broadcast" style="font-size:13px;"></i>SOOP</a></div>
+    </div>
+    <div class="player-card">
+     <div class="player-img"><i class="ti ti-user" style="font-size:56px;color:#c7c7cc;"></i><span class="player-role-badge">輔助</span></div>
+     <div class="player-info"><div class="player-id">Keria</div><div class="player-name">柳岷析</div><a class="soop-btn" href="https://play.sooptv.com/channels/10277610" target="_blank"><i class="ti ti-broadcast" style="font-size:13px;"></i>SOOP</a></div>
+    </div>
+   </div>
+  </div>
+
+  <!-- 首頁 -->
+  <div class="page" id="page-home">
+   <div class="legend">
+    <div class="legend-item"><div class="legend-dot match"></div>比賽</div>
+    <div class="legend-item"><div class="legend-dot live"></div>直播</div>
+    <div class="legend-item"><div class="legend-dot video"></div>新影片</div>
+    <div class="legend-item"><div class="legend-dot activity"></div>活動</div>
+   </div>
+   <div class="cal-wrap">
+    <div class="cal-nav">
+     <button class="cal-nav-btn" onclick="prevMonth()">‹</button>
+     <span class="cal-month" id="calMonth"></span>
+     <button class="cal-nav-btn" onclick="nextMonth()">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+   </div>
+   <div class="schedule-section">
+    <div class="schedule-date-title"><div class="schedule-date-dot"></div><span id="selectedDateTitle">今日行程</span></div>
+    <div id="eventList"><div class="loading">載入中...</div></div>
+   </div>
+  </div>
+
+  <!-- 賽程頁 -->
+  <div class="page" id="page-schedule">
+   <div id="scheduleContent"><div class="loading">⏳ 載入賽程中...</div></div>
+  </div>
+
+ </div>
+
+ <div class="tabbar">
+  <div class="tab active" id="tab-players" onclick="switchTab('players','選手資料')"><i class="ti ti-users"></i>選手</div>
+  <div class="tab" id="tab-home" onclick="switchTab('home','首頁')"><i class="ti ti-home"></i>首頁</div>
+  <div class="tab" id="tab-schedule" onclick="switchTab('schedule','賽程')"><i class="ti ti-calendar"></i>賽程</div>
+ </div>
+</div>
+
+<script>
+const EVENTS_URL = 'https://yitin0826.github.io/t1-schedule/events.json';
+const API_KEY = '0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z';
+const LCK_ID = '98767991310872058';
+
+let EVENTS = {};
+let eventsLoaded = false;
+let schedLoaded = false;
+
+const today = new Date(); today.setHours(0,0,0,0);
+let selDate = new Date(today);
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth();
+
+/* ── 載入 events.json ── */
+async function loadEvents() {
+  try {
+    const res = await fetch(EVENTS_URL + '?t=' + Date.now());
+    EVENTS = await res.json();
+  } catch {
+    EVENTS = {};
+  }
+  eventsLoaded = true;
+  renderCalendar();
+  renderEvents();
+}
+
+/* ── 月曆 ── */
+function dKey(d) { return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
+function fmtDate(d) {
+  const days = ['日','一','二','三','四','五','六'];
+  return (d.getMonth()+1) + '月' + d.getDate() + '日（' + days[d.getDay()] + '）';
+}
+function getTypes(k) {
+  const e = EVENTS[k] || [];
+  return {
+    hasMatch: e.some(x => x.type==='match'),
+    hasLive: e.some(x => x.type==='live'),
+    hasVideo: e.some(x => x.type==='video'),
+    hasActivity: e.some(x => x.type==='activity')
+  };
+}
+function renderCalendar() {
+  const g = document.getElementById('calGrid'); g.innerHTML = '';
+  document.getElementById('calMonth').textContent = viewYear + '年' + (viewMonth+1) + '月';
+  ['日','一','二','三','四','五','六'].forEach(d => {
+    const el = document.createElement('div'); el.className = 'cal-hd'; el.textContent = d; g.appendChild(el);
+  });
+  const first = new Date(viewYear, viewMonth, 1).getDay();
+  const last = new Date(viewYear, viewMonth+1, 0).getDate();
+  const prevLast = new Date(viewYear, viewMonth, 0).getDate();
+  for (let i = 0; i < first; i++) {
+    const c = document.createElement('div'); c.className = 'cal-cell';
+    const n = document.createElement('div'); n.className = 'cal-num other-num'; n.textContent = prevLast-first+i+1;
+    const d = document.createElement('div'); d.className = 'cal-dots';
+    c.appendChild(n); c.appendChild(d); g.appendChild(c);
+  }
+  for (let d = 1; d <= last; d++) {
+    const dt = new Date(viewYear, viewMonth, d);
+    const k = viewYear + '-' + (viewMonth+1) + '-' + d;
+    const {hasMatch, hasLive, hasVideo, hasActivity} = getTypes(k);
+    const c = document.createElement('div'); c.className = 'cal-cell';
+    const n = document.createElement('div');
+    n.textContent = d;
+    if (dt.getTime() === today.getTime()) n.className = 'cal-num today-num';
+    else if (dt.getTime() === selDate.getTime()) n.className = 'cal-num selected-num';
+    else n.className = 'cal-num';
+    const dots = document.createElement('div'); dots.className = 'cal-dots';
+    if (hasMatch) { const dot = document.createElement('div'); dot.className = 'dot match'; dots.appendChild(dot); }
+    if (hasLive)  { const dot = document.createElement('div'); dot.className = 'dot live'; dots.appendChild(dot); }
+    if (hasVideo) { const dot = document.createElement('div'); dot.className = 'dot video'; dots.appendChild(dot); }
+    if (hasActivity) { const dot = document.createElement('div'); dot.className = 'dot activity'; dots.appendChild(dot); }
+    c.appendChild(n); c.appendChild(dots);
+    c.onclick = (() => { const _dt = new Date(viewYear, viewMonth, d); return () => { selDate = _dt; renderCalendar(); renderEvents(); }; })();
+    g.appendChild(c);
+  }
+}
+function renderEvents() {
+  const k = dKey(selDate);
+  const evs = EVENTS[k] || [];
+  const isToday = selDate.getTime() === today.getTime();
+  document.getElementById('selectedDateTitle').textContent = isToday ? '今日行程' : fmtDate(selDate) + ' 行程';
+  const list = document.getElementById('eventList');
+  if (evs.length === 0) { list.innerHTML = '<div class="no-event">📭 這天沒有行程</div>'; return; }
+  list.innerHTML = evs.map(e => `
+    <div class="event-card">
+     <div class="event-type-bar ${e.type}"></div>
+     <div>
+      <span class="event-tag ${e.type}">${e.tag}</span>
+      <div class="event-title">${e.title}</div>
+      <div class="event-meta"><i class="ti ti-clock" style="font-size:11px;margin-right:4px;"></i>${e.meta}</div>
+     </div>
+    </div>`).join('');
+}
+function prevMonth() { viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; } renderCalendar(); }
+function nextMonth() { viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; } renderCalendar(); }
+
+/* ── 賽程 API ── */
+function isT1(t) { return t.name === 'T1' || t.code === 'T1'; }
+function getT1(teams) { return teams.find(t => isT1(t)); }
+function getOpp(teams) { return teams.find(t => !isT1(t)); }
+function toTWTime(utc) { return new Date(utc).toLocaleString('zh-TW', {timeZone:'Asia/Taipei', hour:'2-digit', minute:'2-digit', hour12:true}); }
+function toTWDate(utc) {
+  const tw = new Date(new Date(utc).toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
+  const days = ['日','一','二','三','四','五','六'];
+  return (tw.getMonth()+1) + '月' + tw.getDate() + '日（' + days[tw.getDay()] + '）';
+}
+function logoImg(team, size='small') {
+  const s = size === 'big' ? 44 : 28;
+  const cls = size === 'big' ? 'team-logo-img' : 'sched-logo-img';
+  const fb = size === 'big' ? 'team-logo-fallback' : 'sched-logo-fallback';
+  if (team?.image) return `<img class="${cls}" src="${team.image}" width="${s}" height="${s}" alt="${team.code}" onerror="this.outerHTML='<div class=\\'${fb}\\'>${team.code||'?'}</div>'">`;
+  return `<div class="${fb}" style="width:${s}px;height:${s}px;">${team?.code||'?'}</div>`;
+}
+function schedCard(e) {
+  const opp = getOpp(e.match.teams);
+  return `<div class="sched-card">
+   <div class="sched-top"><span class="sched-date"><i class="ti ti-calendar" style="font-size:12px;margin-right:4px;"></i>${toTWDate(e.startTime)}</span><span class="sched-badge-upcoming">待開打</span></div>
+   <div class="sched-teams">
+    <div class="sched-logo-t1">T1</div><span class="sched-vs">vs</span>${logoImg(opp,'small')}
+    <div style="margin-left:6px;flex:1;"><div class="sched-name">T1 vs ${opp?.name}</div><div class="sched-time"><i class="ti ti-clock" style="font-size:11px;margin-right:2px;"></i>${toTWTime(e.startTime)}</div></div>
+   </div>
+  </div>`;
+}
+function todayCard(event) {
+  if (!event) return `<div class="no-today">📅 今天沒有 T1 的比賽</div>`;
+  const t1 = getT1(event.match.teams); const opp = getOpp(event.match.teams);
+  const badge = event.state === 'inProgress' ? '<span class="status-badge live">🔴 直播中</span>'
+    : event.state === 'unstarted' ? '<span class="status-badge upcoming">即將開始</span>'
+    : '<span class="status-badge completed">已結束</span>';
+  const t1S = t1?.result?.gameWins ?? '-'; const oppS = opp?.result?.gameWins ?? '-';
+  return `<div class="today-card">
+   <div class="today-header"><span class="today-title"><i class="ti ti-calendar-event" style="margin-right:4px;font-size:14px;"></i>今日賽程</span>${badge}</div>
+   <div class="match-row">
+    <div class="team">${logoImg(t1,'big')}<div class="team-name">T1</div></div>
+    <div class="vs-block"><div class="score">${t1S} : ${oppS}</div><div class="match-time-txt">${toTWTime(event.startTime)}</div></div>
+    <div class="team">${logoImg(opp,'big')}<div class="team-name">${opp?.code}</div></div>
+   </div>
+   <div class="match-meta">
+    <span><i class="ti ti-tournament" style="font-size:12px;margin-right:4px;"></i>LCK 2026 夏季賽</span>
+    <span><i class="ti ti-clock" style="font-size:12px;margin-right:4px;"></i>${toTWTime(event.startTime)}</span>
+   </div>
+  </div>`;
+}
+async function loadSchedule() {
+  if (schedLoaded) return;
+  try {
+    const res = await fetch(`https://esports-api.lolesports.com/persisted/gw/getSchedule?hl=zh-TW&leagueId=${LCK_ID}`, {headers: {'x-api-key': API_KEY}});
+    const data = await res.json();
+    const allT1 = data.data.schedule.events.filter(e => e.match?.teams?.some(t => isT1(t)));
+    const now = new Date();
+    const todayStart = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Taipei'})); todayStart.setHours(0,0,0,0);
+    const todayEnd = new Date(todayStart); todayEnd.setHours(23,59,59,999);
+    const todayGame = allT1.find(e => { const tw = new Date(new Date(e.startTime).toLocaleString('en-US', {timeZone:'Asia/Taipei'})); return tw >= todayStart && tw <= todayEnd; });
+    const upcoming = allT1.filter(e => { const tw = new Date(new Date(e.startTime).toLocaleString('en-US', {timeZone:'Asia/Taipei'})); return tw > todayEnd && e.state !== 'completed'; }).slice(0, 6);
+    let html = `<div class="schedule-hero"><div class="hero-label"><i class="ti ti-calendar-event" style="font-size:13px;"></i>今日比賽</div>${todayCard(todayGame)}</div><div class="sched-section">`;
+    if (upcoming.length > 0) { html += `<div class="sched-section-title">後續賽程</div>`; upcoming.forEach(e => { html += schedCard(e); }); }
+    else { html += `<div style="text-align:center;padding:20px;color:#8e8e93;font-size:14px;">📅 暫無後續賽程</div>`; }
+    html += `</div>`;
+    document.getElementById('scheduleContent').innerHTML = html;
+    schedLoaded = true;
+  } catch {
+    document.getElementById('scheduleContent').innerHTML = `<div class="error-msg">⚠️ 賽程載入失敗<br><small style="color:#8e8e93;font-size:12px;">請檢查網路連線</small></div>`;
+  }
+}
+
+/* ── Tab 切換 ── */
+function switchTab(page, title) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('tab-' + page).classList.add('active');
+  document.getElementById('topbarTitle').textContent = title;
+  if (page === 'schedule') loadSchedule();
+}
+
+/* ── Service Worker ── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/t1-schedule/sw.js').catch(() => {});
+}
+
+/* 初始化 */
+loadEvents();
+</script>
+</body>
+</html>
